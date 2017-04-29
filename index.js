@@ -4,6 +4,78 @@ var hex = require("hex");
 
 var re = /^(\w+\s?\w+)\s*:\s(.+)\n?$/;
 
+
+var ApcAccess = function() {
+  this._waitForResponse = false;
+  this._socket = new net.Socket();
+  this._requests = [];
+  this._receiveBuffer = Buffer.allocUnsafe(0);
+  this._socket.on('data', (data) => {
+    var req = this._requests[0];
+    if(req && this._waitForResponse) {
+      this._receiveBuffer = Buffer.concat([this._receiveBuffer, data], this._receiveBuffer.length + data.length);
+      while(this._receiveBuffer.length > 2) {
+        var length = this._receiveBuffer.readUInt16BE(0);
+        req.res += this._receiveBuffer.toString('ascii',2,length+2);
+        this._receiveBuffer = this._receiveBuffer.slice(length+2);
+      }
+      if(this._receiveBuffer.length === 2 && this._receiveBuffer.readUInt16BE(0) === 0) {
+        var req = this._requests.shift();
+        this._waitForResponse = false;
+        this._receiveBuffer = Buffer.allocUnsafe(0);
+        process.nextTick(function() {
+          req.handler(req.res);
+        });
+        this._flush();
+      }
+    }
+  });
+};
+
+ApcAccess.prototype = {
+  connect: function() {
+    this._socket.connect(3551, 'obelix', () => {
+      console.log('Connected');
+    });
+  },
+  disconnect: function() {
+    this._socket.end();
+    console.log('disconnected');
+  },
+  getStatus: function() {
+    this._requests.push({
+      handler: this._statusHandler,
+      cmd: 'status',
+      res: ''
+    });
+    this._flush();
+  },
+  getEvents: function() {
+    this._requests.push({
+      handler: this._eventsHandler,
+      cmd: 'events',
+      res: ''
+    });
+    this._flush();
+  },
+  _statusHandler: function(data) {
+    console.log(data);
+  },
+  _eventsHandler: function(data) {
+    console.log(data);
+  },
+  _flush: function() {
+    var req = this._requests[0];
+    if(req && !this._waitForResponse) {
+      this._waitForResponse = true;
+      var buffer = Buffer.allocUnsafe(req.cmd.length + 2);
+      buffer.writeUInt16BE(req.cmd.length, 0);
+      buffer.write(req.cmd,2);
+      this._socket.write(buffer);
+    }
+  }
+};
+
 var NisClient = function() {
   this._client = new net.Socket();
   this._client.on('data', (data) => {
@@ -90,19 +162,30 @@ NisClient.prototype._handleStatusReply = function(data) {
   }
 };
 
-var client = new NisClient();
-client.connect();
+var apcaccess = new ApcAccess();
+apcaccess.connect();
 
-function loopSt() {
-  client.requestStatus();
-  //client.requestEvents();
-  setTimeout(loopEv, 1000);
-}
+apcaccess.getStatus();
 
-function loopEv() {
-  client.requestEvents();
-  //client.requestEvents();
-  setTimeout(loopSt, 1000);
-}
+apcaccess.getStatus();
 
-loopEv();
+apcaccess.getEvents();
+
+//apcaccess.disconnect();
+
+// var client = new NisClient();
+// client.connect();
+//
+// function loopSt() {
+//   client.requestStatus();
+//   //client.requestEvents();
+//   setTimeout(loopEv, 1000);
+// }
+//
+// function loopEv() {
+//   client.requestEvents();
+//   //client.requestEvents();
+//   setTimeout(loopSt, 1000);
+// }
+//
+// loopEv();
