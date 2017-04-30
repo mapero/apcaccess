@@ -1,7 +1,19 @@
 {
   "name": "apcaccess",
   "version": "1.0.0",
-  "description": "This is a native nodejs implementation of the apcaccess client for the apcupsd network information server (NIS)",
+  "description": "apcaccess client library and cli written in node.js",
+  "keywords": [
+    "apcupsd",
+    "apcaccess",
+    "apc",
+    "ups",
+    "uninterruptible power supply",
+    "nis"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mapero/apcaccess"
+  },
   "main": "./lib/apcaccess.js",
   "bin": {
     "apcaccessjs": "./index.js"
