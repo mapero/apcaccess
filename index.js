@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var ApcAccess = require('./lib/apcaccess');
 var cli = require('cli');
 
