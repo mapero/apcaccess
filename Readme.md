@@ -1,5 +1,9 @@
 # apcaccess client library and cli written in node.js
 
+[![npm version](https://badge.fury.io/js/apcaccess.svg)](https://badge.fury.io/js/apcaccess)
+
+[![NPM](https://nodei.co/npm/apcaccess.png)](https://nodei.co/npm/apcaccess/)
+
 This is a node.js implementation of an apcupsd nis client. The module comes with a command line interface and a library you can use in your projects.
 
 ## Prerequisites
