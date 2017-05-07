@@ -25,6 +25,25 @@ describe('apcaccess', function() {
     it('with wrong port should be rejected with Error', function() {
       return client.connect(host, 1234).should.be.rejectedWith(Error);
     });
+    it('should emit an event when connecting', function(done) {
+      this.timeout(5000);
+      client.once('connect', () => {
+        done();
+      });
+      client.connect(host, port);
+    });
+  });
+  describe('#disconnect()', function() {
+    beforeEach(function() {
+      return client.connect(host, port);
+    });
+    it('should emit an event when disconnect', function(done) {
+      this.timeout(5000);
+      client.once('disconnect', () => {
+        done();
+      });
+      client.disconnect();
+    });
   });
   describe('.isConnected', function() {
     afterEach(function() {
