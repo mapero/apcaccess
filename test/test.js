@@ -14,7 +14,7 @@ var port = process.env.PORT || 3551;
 describe('apcaccess', function() {
   describe('#connect()', function() {
     afterEach(function() {
-      if(client.isConnected) return client.disconnect();
+      return client.disconnect();
     });
     it('should be fulfilled', function() {
       return client.connect(host, port).should.be.fulfilled;
