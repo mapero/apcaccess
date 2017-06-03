@@ -70,7 +70,7 @@ var client = new ApcAccess();
 
 client.connect('localhost', 3551)
   .then(function() {
-    return client.status();
+    return client.getStatus();
   })
   .then(function(result) {
     console.log(result)
@@ -131,7 +131,7 @@ var client = new ApcAccess();
 
 client.connect('localhost', 3551)
   .then(function() {
-    return client.events();
+    return client.getEvents();
   })
   .then(function(result) {
     console.log(result)
@@ -170,7 +170,7 @@ var client = new ApcAccess();
 
 client.connect('localhost', 3551)
   .then(function() {
-    return client.statusJson();
+    return client.getStatusJson();
   })
   .then(function(result) {
     console.log(result)
